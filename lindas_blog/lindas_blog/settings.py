@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'm81ig)tprk+hh=+$+wd$bh#fp^7mn3kjz$9r*yxscfxh8ig4!f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG_VALUE') == 'True'
 
 ALLOWED_HOSTS = ['lindas-blog.herokuapp.com']
 
