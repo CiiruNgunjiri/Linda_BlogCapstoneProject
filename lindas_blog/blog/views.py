@@ -1,0 +1,106 @@
+from rest_framework import generics, permissions
+from .models import Post, Category, Comment, Like, Profile
+from .serializers import PostSerializer, CategorySerializer, CommentSerializer, LikeSerializer, ProfileSerializer
+from django.contrib.auth.models import User
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+
+class UserRegister(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    
+    def create(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+        
+        user = User(username=username, email=email)
+        user.set_password(password)  # Hash the password
+        user.save()
+        
+        return Response({"message": "User created successfully."})
+
+class PostList(generics.ListCreateAPIView):
+    """API view to retrieve and create blog posts."""
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        """Optionally filter posts by draft status."""
+        queryset = super().get_queryset()  # Get the original queryset
+        is_draft = self.request.query_params.get('is_draft', None)
+        if is_draft is not None:
+            # Filter based on the draft status provided in query parameters
+            return queryset.filter(is_draft=is_draft.lower() == 'true')
+        return queryset
+
+
+class PostDetail(generics.RetrieveUpdateDestroyAPIView):
+    """API view to retrieve, update, or delete a specific blog post."""
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_update(self, serializer):
+        """Override to ensure that only the author can update their post."""
+        serializer.save(author=self.request.user)
+
+
+class CategoryList(generics.ListCreateAPIView):
+    """API view to retrieve and create categories."""
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
+    """API view to retrieve, update, or delete a specific category."""
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class CommentList(generics.ListCreateAPIView):
+    """API view to retrieve and create comments on posts."""
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        """Override to set the author of the comment to the current user."""
+        serializer.save(author=self.request.user)
+
+
+class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
+    """API view to retrieve, update, or delete a specific comment."""
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
+class LikeList(generics.ListCreateAPIView):
+    """API view to retrieve and create likes for posts."""
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        """Override to ensure that a user can like a post only once."""
+        post_id = self.request.data.get('post')
+        if Like.objects.filter(post_id=post_id, user=self.request.user).exists():
+            raise serializers.ValidationError("You have already liked this post.")
+        serializer.save(user=self.request.user)
+
+
+class LikeDetail(generics.RetrieveDestroyAPIView):
+    """API view to retrieve or delete a specific like."""
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class ProfileDetail(generics.RetrieveUpdateAPIView):
+    """API view to retrieve or update a user's profile."""
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+   
