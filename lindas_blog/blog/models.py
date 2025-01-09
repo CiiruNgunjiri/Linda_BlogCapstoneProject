@@ -22,6 +22,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')  # Related name for easier access
+    slug = models.SlugField(max_length=200, unique=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='posts')  # Related name for easier access
     published_date = models.DateTimeField(auto_now_add=True)
     created_date = models.DateTimeField(auto_now=True)
