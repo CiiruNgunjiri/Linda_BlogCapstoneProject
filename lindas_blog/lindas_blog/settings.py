@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 import django_heroku
+import dj_database_url
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -84,7 +85,11 @@ WSGI_APPLICATION = 'lindas_blog.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+}
+
+DATABASES = {
+        'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('DB_NAME', 'new_database'),
         'USER': os.getenv('DB_USER', 'linda02'),
@@ -93,6 +98,11 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', '5432'), #Default PostgreSQL port
     }
 }
+
+
+
+# Configure the database from the DATABASE_URL environment variable (for Heroku)
+DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 # Security settings
 SECURE_BROWSER_XSS_FILTER = True
