@@ -1,1 +1,1 @@
-web: gunicorn lindas_blog.wsgi --log-file -
+web: gunicorn Linda_BlogCapstoneProject.wsgi --log-file -
