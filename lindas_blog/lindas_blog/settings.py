@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', "m81ig)tprk+hh=+$+wd$bh#fp^7mn3kjz$9r*yxscf
 DEBUG = False
 #os.environ.get('DEBUG_VALUE', 'False') == 'True'
 
-ALLOWED_HOSTS = ['lindas-blog.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['lindas-blog.herokuapp.com', 'localhost', '127.0.0.1:8000']
 
 
 # Application definition
@@ -69,7 +69,7 @@ ROOT_URLCONF = 'lindas_blog.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'blog/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

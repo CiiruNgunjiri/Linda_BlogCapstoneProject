@@ -1,0 +1,14 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Home - My Blog{% endblock %}
+
+{% block content %}
+<h2>Latest Posts</h2>
+<ul>
+    {% for post in posts %}
+        <li><a href="{% url 'blog:post-detail' post.id %}">{{ post.title }}</a> by {{ post.author }}</li>
+    {% empty %}
+        <li>No posts available.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
