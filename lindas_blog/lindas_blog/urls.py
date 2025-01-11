@@ -17,10 +17,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
+from blog.views import handler404, handler500
 urlpatterns = [
+    # Admin site
     path('admin/', admin.site.urls),
-    path('api/', include('blog.urls')),
+
+    # API endpoints
+    path('api/', include('blog.urls')),  # Include blog app URLs
+
+    # JWT Authentication
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
+
+# Optional: Custom error handling views can be added here if needed
+handler404 = 'blog.views.handler404'
+handler500 = 'blog.views.handler500'

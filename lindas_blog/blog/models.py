@@ -1,21 +1,29 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Category(models.Model):
     """Model to represent blog categories."""
-    name = models.CharField(max_length=100, unique=True)  # Ensure category names are unique
+    name = models.CharField(max_length=100, unique=True, help_text="Unique name for the category.")
 
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = "Categories"
+   
     def __str__(self):
         return self.name
 
 
 class Tag(models.Model):
     """Model to represent tags for blog posts."""
-    name = models.CharField(max_length=100, unique=True)  # Ensure tag names are unique
+    name = models.CharField(max_length=100, unique=True, help_text="Unique name for the tag.")
 
     def __str__(self):
         return self.name
 
+class PostManager(models.Manager):
+    def published(self):
+        return self.filter(is_draft=False)
 
 class Post(models.Model):
     """Model to represent blog posts."""
@@ -28,7 +36,9 @@ class Post(models.Model):
     created_date = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField(Tag, blank=True, related_name='posts')  # Related name for easier access
     is_draft = models.BooleanField(default=True)  # Field to manage draft status
-
+    
+    objects = PostManager()  # Use custom manager
+ 
     def __str__(self):
         return self.title
 
@@ -41,7 +51,7 @@ class Comment(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Comment by {self.author.username} on {self.post.title}'
+        return f'Comment by {self.author.username} on {self.post.title} at {self.created_date}'
 
 
 class Like(models.Model):

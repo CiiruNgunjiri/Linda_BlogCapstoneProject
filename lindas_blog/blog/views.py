@@ -1,24 +1,46 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from .models import Post, Category, Comment, Like, Profile
 from .serializers import PostSerializer, CategorySerializer, CommentSerializer, LikeSerializer, ProfileSerializer
 from django.contrib.auth.models import User
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
+from django.shortcuts import render
+
+# Custom error handlers
+def handler404(request, exception):
+    """Custom 404 error handler."""
+    return render(request, '404.html', status=404)
+
+def handler500(request):
+    """Custom 500 error handler."""
+    return render(request, '500.html', status=500)
+
+class PublishedPostList(generics.ListAPIView):
+    """API view to retrieve only published blog posts."""
+    queryset = Post.objects.published()  # Use the custom manager method
+    serializer_class = PostSerializer
+    permission_classes = [permissions.AllowAny]  # Allow anyone to view published posts
+
 
 class UserRegister(generics.CreateAPIView):
+    """API view for user registration."""
     queryset = User.objects.all()
-    permission_classes = [AllowAny]
-    
+    permission_classes = [permissions.AllowAny]
+
     def create(self, request, *args, **kwargs):
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
-        
+
+        if not username or not email or not password:
+            raise ValidationError("All fields are required.")
+
         user = User(username=username, email=email)
         user.set_password(password)  # Hash the password
         user.save()
-        
-        return Response({"message": "User created successfully."})
+
+        return Response({"message": "User created successfully."}, status=status.HTTP_201_CREATED)
+
 
 class PostList(generics.ListCreateAPIView):
     """API view to retrieve and create blog posts."""
@@ -28,11 +50,12 @@ class PostList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         """Optionally filter posts by draft status."""
-        queryset = super().get_queryset()  # Get the original queryset
+        queryset = super().get_queryset()
         is_draft = self.request.query_params.get('is_draft', None)
+        
         if is_draft is not None:
-            # Filter based on the draft status provided in query parameters
-            return queryset.filter(is_draft=is_draft.lower() == 'true')
+            queryset = queryset.filter(is_draft=is_draft.lower() == 'true')
+        
         return queryset
 
 
@@ -43,7 +66,7 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_update(self, serializer):
-        """Override to ensure that only the author can update their post."""
+        """Ensure that only the author can update their post."""
         serializer.save(author=self.request.user)
 
 
@@ -66,7 +89,7 @@ class CommentList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        """Override to set the author of the comment to the current user."""
+        """Set the author of the comment to the current user."""
         serializer.save(author=self.request.user)
 
 
@@ -84,10 +107,12 @@ class LikeList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        """Override to ensure that a user can like a post only once."""
+        """Ensure that a user can like a post only once."""
         post_id = self.request.data.get('post')
+
         if Like.objects.filter(post_id=post_id, user=self.request.user).exists():
-            raise serializers.ValidationError("You have already liked this post.")
+            raise ValidationError("You have already liked this post.")
+        
         serializer.save(user=self.request.user)
 
 
@@ -103,4 +128,3 @@ class ProfileDetail(generics.RetrieveUpdateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 
-   

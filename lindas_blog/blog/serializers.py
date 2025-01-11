@@ -4,29 +4,31 @@ import markdown2
 
 class PostSerializer(serializers.ModelSerializer):
     """Serializer for the Post model."""
-    content_markdown = serializers.SerializerMethodField()  # field name
+    content_html = serializers.SerializerMethodField()  # Renamed for clarity
 
     class Meta:
         model = Post
-        fields = '__all__'  # Consider specifying fields explicitly for better control
+        fields = ['id', 'title', 'content', 'content_html', 'author', 'slug', 'category', 'published_date', 'created_date', 'tags', 'is_draft']  # Explicitly specify fields
 
-    def get_content_markdown(self, obj):
+    def get_content_html(self, obj):
         """Convert post content from Markdown to HTML."""
         return markdown2.markdown(obj.content)  # Convert content to HTML using markdown2
 
 
 class CategorySerializer(serializers.ModelSerializer):
     """Serializer for the Category model."""
+    
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ['id', 'name']  # Explicitly specify fields
 
 
 class TagSerializer(serializers.ModelSerializer):
     """Serializer for the Tag model."""
+    
     class Meta:
         model = Tag
-        fields = '__all__'
+        fields = ['id', 'name']  # Explicitly specify fields
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -35,7 +37,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['id', 'post', 'author', 'content', 'created_date']  # Explicitly specify fields
 
 
 class LikeSerializer(serializers.ModelSerializer):
@@ -44,7 +46,7 @@ class LikeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Like
-        fields = '__all__'
+        fields = ['id', 'post', 'user']  # Explicitly specify fields
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -53,4 +55,4 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = ['id', 'user', 'bio', 'profile_picture']  # Explicitly specify fields
