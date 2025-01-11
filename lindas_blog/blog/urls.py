@@ -10,7 +10,7 @@ from .views import (
     LikeDetail,
     ProfileDetail
 )
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, ProfileDetailView
 
 app_name = 'blog'  # Namespace for the app
 
@@ -18,6 +18,8 @@ urlpatterns = [
     # Authentication URLs
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/profiles/<int:pk>/', ProfileDetailView.as_view(), name='profile-detail'),
+
 
     # Blog post URLs
     path('posts/', PostList.as_view(), name='post-list'),

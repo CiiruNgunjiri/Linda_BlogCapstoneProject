@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,8 +15,13 @@
             <ul>
                 <li><a href="{% url 'blog:post-list' %}">Home</a></li>
                 <li><a href="{% url 'blog:category-list' %}">Categories</a></li>
-                <li><a href="{% url 'blog:profile-detail' user.id %}">Profile</a></li>
-            </ul>
+                {% if user.id %}
+    <a href="{% url 'profile-detail' user.id %}">Profile</a>
+{% else %}
+    <span>No Profile Available</span>
+{% endif %}
+
+                </ul>
         </nav>
     </header>
 

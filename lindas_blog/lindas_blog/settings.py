@@ -69,7 +69,7 @@ ROOT_URLCONF = 'lindas_blog.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'blog/templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'blog/templates/blog')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -99,7 +99,8 @@ DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'True')=='True' # Redirect all HTTP traffic to HTTPS
+SECURE_SSL_REDIRECT = False
+#os.environ.get('SECURE_SSL_REDIRECT', 'True')=='True' # Redirect all HTTP traffic to HTTPS
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
