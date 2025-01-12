@@ -12,10 +12,13 @@ from .views import (
     ProfileDetail
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.contrib.auth import views as auth_views
 
 app_name = 'blog'  # Namespace for the app
 
 urlpatterns = [
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+
     # Authentication URLs
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

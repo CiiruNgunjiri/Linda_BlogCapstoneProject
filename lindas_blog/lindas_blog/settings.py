@@ -96,6 +96,8 @@ DATABASES = {
 # Configure the database from the DATABASE_URL environment variable (for Heroku)
 DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
+LOGIN_URL = 'login'  # This should match the name of your login URL pattern
+
 # Security settings
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
