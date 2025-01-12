@@ -15,6 +15,7 @@ import os
 import django_heroku
 import dj_database_url
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv()
 
@@ -26,13 +27,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', "m81ig)tprk+hh=+$+wd$bh#fp^7mn3kjz$9r*yxscfxh8ig4!f")
+SECRET_KEY = os.getenv('SECRET_KEY', 'm81ig)tprk+hh=+$+wd$bh#fp^7mn3kjz$9r*yxscfxh8ig4!f')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 #os.environ.get('DEBUG_VALUE', 'False') == 'True'
 
-ALLOWED_HOSTS = ['lindas-blog.herokuapp.com', 'localhost', '127.0.0.1:8000']
+ALLOWED_HOSTS = ['lindas-blog.herokuapp.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -99,8 +100,10 @@ DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_SSL_REDIRECT = False
-#os.environ.get('SECURE_SSL_REDIRECT', 'True')=='True' # Redirect all HTTP traffic to HTTPS
+SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'True')=='True' # Redirect all HTTP traffic to HTTPS
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -119,6 +122,21 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# JWT Authentication settings
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+}
 
 
 # Internationalization

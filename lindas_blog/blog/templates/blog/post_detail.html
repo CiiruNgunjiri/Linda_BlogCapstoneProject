@@ -9,4 +9,5 @@
 <p>By {{ post.author }} on {{ post.published_date }}</p>
 <div>{{ post.content|safe }}</div> <!-- Use |safe if content includes HTML -->
 <a href="{% url 'blog:post-list' %}">Back to posts</a>
+
 {% endblock %}
